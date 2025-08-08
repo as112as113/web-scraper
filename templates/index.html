@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>网页采集器</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>网页采集器</h1>
+        <form id="scrapeForm">
+            <input type="text" name="url" placeholder="输入网址" required>
+            <button type="submit">开始采集</button>
+        </form>
+        <div id="result"></div>
+    </div>
+<script>
+document.getElementById('scrapeForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    const res = await fetch('/scrape', { method: 'POST', body: formData });
+    const data = await res.json();
+    const resultDiv = document.getElementById('result');
+    if (data.error) {
+        resultDiv.innerHTML = '<p style="color:red;">' + data.error + '</p>';
+    } else {
+        let html = '<h2>文本内容</h2><p>' + data.text + '</p>';
+        if (data.images.length > 0) {
+            html += '<h2>图片预览</h2>';
+            data.images.forEach(src => {
+                html += '<img src="' + src + '" style="max-width:200px;margin:5px;">';
+            });
+        }
+        resultDiv.innerHTML = html;
+    }
+});
+</script>
+</body>
+</html>
